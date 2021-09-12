@@ -42,14 +42,16 @@
   const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000)
   const renderer = new THREE.WebGLRenderer({antialias:true, canvas: canvas, alpha:true})
 
-  camera.position.set(300,300,-300)
+  // camera.position.set(300,300,-300)
+  camera.position.set(410,-46.5,238.5)
   camera.lookAt(0,0,0)
 
   // adding camera control
   var controls = new OrbitControls( camera, renderer.domElement )
 
   // adding axes lines to scene
-  var axesHelper = new THREE.AxesHelper( 5 )
+  var axesHelper = new THREE.AxesHelper( 400 )
+  axesHelper.position.set(0,-86,0)
   scene.add(axesHelper)
 
   scene.add(camera)
@@ -100,15 +102,24 @@
   const wheels = createWheels();
   const car = new THREE.Group()
   car.add( carBase ); car.add( carTop ); car.add( wheels )
-  
-  car.position.x = 10
+  car.position.set(300,-80,0)
+  // car.position.x = 300;
+  car.rotation.set(Math.PI,0,Math.PI)
+  // car.rotation.z = Math.PI;
+  // car.rotation.x = Math.PI;
+  car.scale.set(10,10,10);
   scene.add( car );
 
 
   function animate()
   {
     requestAnimationFrame(animate);
-    console.log(camera)
+    if(car.position.x>=0){
+          car.position.x -= 0.8;
+    }
+    else{
+      car.position.x = 300;
+    }
     renderer.render(scene,camera)
   }
 
