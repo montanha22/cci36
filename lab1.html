@@ -1,339 +1,209 @@
 <html>
+
 <head>
-<meta charset=utf-8>
-<title>Rotation Sequence</title>
-<!-- Another THREE.JS Example by Prof. Carlos Forster from
- Technological Institute of Aeronautics 27/8/2021 --> 
-<style>
-  body {margin:0; overflow:hidden;}
-</style>
+  <meta charset=utf-8>
+  <title>Rotation Sequence</title>
+  <!-- Another THREE.JS Example by Prof. Carlos Forster from
+ Technological Institute of Aeronautics 27/8/2021 -->
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
 </head>
 
 <body>
-<!-- canvas id="hicanvas" width="600" height="600"></canvas -->
-<canvas id="offscreen" width="2048" height="1360" style="display:none"></canvas>
+  <!-- canvas id="hicanvas" width="600" height="600"></canvas -->
+  <canvas id="offscreen" width="2048" height="1360" style="display:none"></canvas>
+  <img id="ico" width="2048" height="1360" src="static/mesa.jpg" />
 
-<p>Exemplo de um canvas transparente ajustado para o tamanho de uma imagem</p>
+  <script type="module">
+    import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
+    import * as CAR from "./js/car.js";
 
-<img id="ico" width="2048" height="1360" src="static/table.jpg" />
-
-
-<script type="module">
-  import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
-  // import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
-
-  var k = document.getElementById("ico");
-  var b = k.getBoundingClientRect(); 
-  console.log(b);
-
-  var x = document.createElement("CANVAS");
-  
-  x.style.position="absolute";
-  x.width=b.width;
-  x.height=b.height;
-  x.style.top=""+b.top+"px";
-  x.style.left=""+b.left+"px";
-
-  document.body.appendChild(x);
-  function createProjCamera(fSpyParameters, ) {
+    const imageWidth = 2048
+    const imageHeight = 1360
 
 
-    // field of view (in vertical degrees)
-    const fov = (fSpyParameters.verticalFieldOfView * 180) / Math.PI;
-    console.log(fov)
-    // aspect ratio
-    const aspect = fSpyParameters.imageWidth / fSpyParameters.imageHeight;
 
-    // Create the camera
-    const camera = new THREE.PerspectiveCamera(fov, aspect, 0.01, 2000);
+    var k = document.getElementById("ico");
+    var b = k.getBoundingClientRect();
+    console.log(b);
 
-    // Position the camera
-    const matrix4 = new THREE.Matrix4();
-    matrix4.set(...fSpyParameters.cameraTransform.rows.flat());
+    var x = document.createElement("CANVAS");
+    x.style.position = "absolute";
+    x.width = b.width;
+    x.height = b.height;
+    x.style.top = "" + b.top + "px";
+    x.style.left = "" + b.left + "px";
+    document.body.appendChild(x);
 
-    camera.applyMatrix4(matrix4);
 
-    // camera.setFocalLength(25.049);
+    function createProjCamera() {
 
-    // fix the offset, in order the principal point to be the center of the image
-    camera.setViewOffset(
-      fSpyParameters.imageWidth,
-      fSpyParameters.imageHeight,
-      -(fSpyParameters.principalPoint.x * fSpyParameters.imageWidth) / 2,
-      (fSpyParameters.principalPoint.y * fSpyParameters.imageHeight) / 2,
-      fSpyParameters.imageWidth,
-      fSpyParameters.imageHeight
-    );
+      const m = new THREE.Matrix4();
+      m.set(
+         0.73309873,  -0.079348, -0.67547772,  -1.5497599,
+         0.63559657, 0.43337594,  0.63890711, 19.26725785,
+        -0.24203979, 0.89771331, -0.36814067, -2.28566293,
+                 0.,         0.,          0.,          1.,
+      ); // calculado no script python
+      const fov = 14;
+      const aspect = 2048 / 1360;
+      const camera = new THREE.PerspectiveCamera(14, aspect, 0.01, 2000);
 
-    camera.updateMatrixWorld();
+      camera.applyMatrix4(m);
+      camera.position.set(11.66329729, 6.42106631, 14.19826186); // calculado no script python
+      camera.lookAt(0, 0, 0);
+      camera.setViewOffset(
+        imageWidth,
+        imageHeight,
+        177,       // calculado no script python
+        -167,      // calculado no script python
+        imageWidth,
+        imageHeight
+      );
+      camera.updateMatrixWorld();
 
-    return camera;
-  }
-  var canvas= x 
-
-  const scene = new THREE.Scene()
-  // const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10000);
-  const camera = createProjCamera(JSON.parse(`{
-  "principalPoint": {
-    "x": 1,
-    "y": -0.6640625
-  },
-  "viewTransform": {
-    "rows": [
-      [
-        0.676717630859556,
-        -0.7260889299729478,
-        0.12185283687534432,
-        -1.7413690456865782
-      ],
-      [
-        0.2016652661093843,
-        0.34198087240239494,
-        0.9178127278241068,
-        0.9275570864952053
-      ],
-      [
-        -0.7080850009206952,
-        -0.5965265699712264,
-        0.37785140305350545,
-        -10
-      ],
-      [
-        0,
-        0,
-        0,
-        1
-      ]
-    ]
-  },
-  "cameraTransform": {
-    "rows": [
-      [
-        0.6767176308595559,
-        0.2016652661093843,
-        -0.7080850009206952,
-        -6.089490920837465
-      ],
-      [
-        -0.7260889299729478,
-        0.34198087240239494,
-        -0.5965265699712264,
-        -7.5468612684254985
-      ],
-      [
-        0.12185283687534432,
-        0.9178127278241068,
-        0.37785140305350545,
-        3.1393810890301297
-      ],
-      [
-        0,
-        0,
-        0,
-        1
-      ]
-    ]
-  },
-  "horizontalFieldOfView": 0.31138373155259436,
-  "verticalFieldOfView": 0.20771531406258048,
-  "vanishingPoints": [
-    {
-      "x": 7.088735333765204,
-      "y": 1.1504113297917975
-    },
-    {
-      "x": -6.7547003891049355,
-      "y": 2.988326477179562
-    },
-    {
-      "x": -1.0545636741536906,
-      "y": -16.13932543698355
+      return camera;
     }
-  ],
-  "vanishingPointAxes": [
-    "xPositive",
-    "yPositive",
-    "zPositive"
-  ],
-  "relativeFocalLength": 6.370961783482432,
-  "imageWidth": 2048,
-  "imageHeight": 1360
-}`))
-  const renderer = new THREE.WebGLRenderer({antialias:true, canvas: canvas, alpha:true})
+    var canvas = x
 
-  // camera.position.set(-2,1,1)
-  // camera.lookAt(0,0,0)
+    const scene = new THREE.Scene()
+    const camera = createProjCamera()
+    const renderer = new THREE.WebGLRenderer({ antialias: true, canvas: canvas, alpha: true })
 
-  // adding camera control
-  // var controls = new OrbitControls( camera, renderer.domElement )
+    // adding axes lines to scene
+    var axesHelper = new THREE.AxesHelper(400)
+    axesHelper.position.set(0, 0, 0)
 
-  // adding axes lines to scene
-  var axesHelper = new THREE.AxesHelper( 400 )
-  axesHelper.position.set(0,0,0)
-  scene.add(axesHelper)
+    // window.onresize = canvasResize
+    // function canvasResize() {
+    //   // camera.aspect = window.innerWidth / window.innerHeight
+    //   // camera.updateProjectionMatrix();
+    // }
 
-  scene.add(camera)
-
-  window.onresize=canvasResize
-
-  function canvasResize()
-  {
-    camera.aspect=window.innerWidth / window.innerHeight
-    camera.updateProjectionMatrix();
-  }
-
-  function createCarBase(){
+    function createCarBase() {
       const geometry = new THREE.BoxGeometry(4.5, 0.8, 1.8);
-      const material = new THREE.MeshBasicMaterial( { color: 0x0000ff } );
-      const carBase = new THREE.Mesh( geometry, material );
+      const material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+      const carBase = new THREE.Mesh(geometry, material);
       return carBase;
-  }
-  function createCarTop(){
+    }
+    function createCarTop() {
       const geometry = new THREE.BoxGeometry(3, 0.8, 1.8);
-      const material = new THREE.MeshBasicMaterial( { color: 0x0000ff } );
-      const carTop = new THREE.Mesh( geometry, material );
+      const material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+      const carTop = new THREE.Mesh(geometry, material);
       carTop.position.y += 0.8;
       carTop.position.x -= 0.75;
       return carTop;
-  }
-  function createWheels(){
+    }
+    function createWheels() {
       const geometry = new THREE.CylinderGeometry(0.4, 0.4, 0.19);
-      const material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
-      const wheel = new THREE.Mesh( geometry, material );
+      const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const wheel = new THREE.Mesh(geometry, material);
       wheel.position.y = -0.4;
       wheel.rotation.x += Math.PI / 2;
-      var dz = 0.9 - 0.19/2 + 0.01;
+      var dz = 0.9 - 0.19 / 2 + 0.01;
       var dx = 1.2;
       var wheels = new THREE.Group()
-      var positions = [[dx,dz], [dx, -dz], [-dx, dz], [-dx, -dz]]
-      for (var i = 0; i<positions.length; i++){
-          var w = wheel.clone()
-          w.position.x = positions[i][0]
-          w.position.z = positions[i][1]
-          wheels.add(w)
+      var positions = [[dx, dz], [dx, -dz], [-dx, dz], [-dx, -dz]]
+      for (var i = 0; i < positions.length; i++) {
+        var w = wheel.clone()
+        w.position.x = positions[i][0]
+        w.position.z = positions[i][1]
+        wheels.add(w)
       }
       return wheels
-  }
-
-  const carBase = createCarBase();
-  const carTop = createCarTop();
-  const wheels = createWheels();
-  const car = new THREE.Group()
-  car.add( carBase ); car.add( carTop ); car.add( wheels )
-  car.position.set(0,0,0)
-  // car.position.x = 300;
-  car.rotation.set(-Math.PI/2,-Math.PI/2,Math.PI)
-  // car.rotation.z = Math.PI;
-  // car.rotation.x = Math.PI;
-  car.scale.set(.1,.1,.1);
-  scene.add( car );
-
-  var btn1 = document.createElement("BUTTON");
-  var a = document.createTextNode("Imagem");
-  btn1.appendChild(a);
-  document.body.appendChild(btn1);
-  
-  btn1.onclick = function()
-  {
-    imagem();
-  }
-
-  var imagem = function()
-  {
-    requestAnimationFrame(imagem);
-    axesHelper.visible = false;
-    car.visible = false;
-    renderer.imagem(scene, camera);
-  }
- 
-  var btn2 = document.createElement("BUTTON");
-  var b = document.createTextNode("Animacao");
-  btn2.appendChild(b);
-  document.body.appendChild(btn2);
-  
-  btn2.onclick = function()
-  {
-    animacao();
-  }
-
-  var animacao = function()
-  {
-    requestAnimationFrame(animacao);
-    car.visible = true;
-    axesHelper.visible  = false
-    renderer.animacao(scene, camera);
-  }
-  
-    
-  var btn3 = document.createElement("BUTTON");
-  var c = document.createTextNode("Eixos");
-  btn3.appendChild(c);
-  document.body.appendChild(btn3);
-  
-  btn3.onclick = function()
-  {
-    eixos();
-  }
-
-  var eixos = function()
-  {
-    requestAnimationFrame(eixos);
-    axesHelper.visible = true;
-    car.visible = false;
-    renderer.eixos(scene, camera);
-  }
- 
-  function animate()
-  {   
-
-    requestAnimationFrame(animate);
-
-    if(car.position.y>=-2){
-          car.position.y -= 0.05;
     }
-    else{
-      console.log(camera)
 
-      car.position.y = 3;
+    const carBase = createCarBase();
+    const carTop = createCarTop();
+    const wheels = createWheels();
+    const car = new THREE.Group()
+    car.add(carBase); car.add(carTop); car.add(wheels)
+    car.position.set(0, 0, 0)
+    car.rotation.set(0, -Math.PI, 0)
+    car.scale.set(.1, .1, .1);
+
+    scene.add(camera)
+    scene.add(car);
+    scene.add(axesHelper)
+
+    var btn1 = document.createElement("BUTTON");
+    var a = document.createTextNode("Imagem");
+    btn1.appendChild(a);
+    document.body.appendChild(btn1);
+
+    btn1.onclick = function () {
+      imagem();
     }
-    renderer.render(scene,camera)
-  }
+
+    var imagem = function () {
+      requestAnimationFrame(imagem);
+      axesHelper.visible = false;
+      car.visible = false;
+      renderer.imagem(scene, camera);
+    }
+
+    var btn2 = document.createElement("BUTTON");
+    var b = document.createTextNode("Animacao");
+    btn2.appendChild(b);
+    document.body.appendChild(btn2);
+
+    btn2.onclick = function () {
+      animacao();
+    }
+
+    var animacao = function () {
+      requestAnimationFrame(animacao);
+      car.visible = true;
+      axesHelper.visible = false
+      renderer.animacao(scene, camera);
+    }
+
+
+    var btn3 = document.createElement("BUTTON");
+    var c = document.createTextNode("Eixos");
+    btn3.appendChild(c);
+    document.body.appendChild(btn3);
+
+    btn3.onclick = function () {
+      eixos();
+    }
+
+    var eixos = function () {
+      requestAnimationFrame(eixos);
+      axesHelper.visible = true;
+      car.visible = false;
+      renderer.eixos(scene, camera);
+    }
 
 
 
+    const circle = { center_x: -5, center_z: -5, radius: 4 }
+    var theta = 0
 
-  console.log(scene.position)
-  // camera.position.set(0,0,0)
-  // camera.lookAt( scene.position ) 
-  // camera.applyMatrix4(m);
+    function animate() {
 
-  // camera.applyMatrix4( m )
-  // for ( var i = 0; i < 16; i++) {
-  //     camera.matrix.elements[i] = m.elements[i];
-  // }
-  // camera.updateMatrixWorld();
+      requestAnimationFrame(animate);
 
-  console.log( camera )
-  // camera.updateProjectionMatrix()
-  // const vec = new THREE.Vector3();
-  // const quaternion = new THREE.Quaternion();
+      car.position.x = circle.center_x + circle.radius * Math.cos(theta)
+      car.position.z = circle.center_z + circle.radius * Math.sin(theta)
+      car.position
+      console.log(car.position)
+      theta += .01
+      car.rotation.y = (3 * Math.PI / 2 - theta)
 
-  // vec.setFromMatrixPosition( m );
-  // quaternion.setFromRotationMatrix ( m )
+      renderer.render(scene, camera)
+    }
 
 
+    console.log(camera)
+    animate()
 
-  // camera.position.set(vec.x, vec.y, vec.z + 700)
-  // camera.applyQuaternion(quaternion); // Apply Quaternion
-  // camera.quaternion.normalize(); 
-  
-
-  // console.log(vec)
-  // console.log(quaternion)
-  // console.log(camera)
-  animate()
-
-</script>
+  </script>
 
 </body>
+
 </html>
