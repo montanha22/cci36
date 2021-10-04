@@ -164,16 +164,6 @@
     scene.add(car);
     scene.add(axesHelper);
 
-    function createBox(){
-      const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-      const material = new THREE.MeshLambertMaterial( {color: 0x00ff00} );
-      const cube = new THREE.Mesh( geometry, material );
-      return cube;
-    } 
- 
-    const cube = createBox();
-    // scene.add(cube);
-
     car.visible = false;
     axesHelper.visible = false;
     gridHelper.visible = false;
@@ -197,6 +187,16 @@
             gridHelper.visible = false;
         }
     };
+    
+    function createBox(){
+      const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+      const material = new THREE.MeshLambertMaterial( {color: 0x00ff00} );
+      const cube = new THREE.Mesh( geometry, material );
+      return cube;
+    } 
+ 
+    const cube = createBox();
+    // scene.add(cube);
 
     const light = new THREE.PointLight( '#ffffff' , 1);
     light.position.set(-5, 1, 0);
