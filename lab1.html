@@ -51,7 +51,7 @@
       ); // calculado no script python
       const fov = 14;
       const aspect = 2048 / 1360;
-      const camera = new THREE.PerspectiveCamera(10, aspect, 0.001, 20000);
+      const camera = new THREE.PerspectiveCamera(9, aspect, 0.001, 20000);
 
       camera.applyMatrix4(m);
       camera.position.set( 14.19826186,  6.42106631,  11.66329729,); // calculado no script python
@@ -88,16 +88,17 @@
 
     function createCarBase() {
       const geometry = new THREE.BoxGeometry(4.5, 0.8, 1.8);
-      const material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+      const material = new THREE.MeshLambertMaterial({ color: 0x00ffff });
       const carBase = new THREE.Mesh(geometry, material);
+      carBase.castShadow = true
       return carBase;
     }
     function createCarTop() {
       const geometry = new THREE.BoxGeometry(3, 0.8, 1.8);
-      const material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+      const material = new THREE.MeshLambertMaterial({ color: 0x00ffff });
       
       const carTop = new THREE.Mesh(geometry, material);
-      carTop.receiveShadow = true
+      carTop.castShadow  = true
       carTop.position.y += 0.8;
       carTop.position.x -= 0.75;
 
@@ -105,12 +106,12 @@
     }
     function createWheels() {
       const geometry = new THREE.CylinderGeometry(0.4, 0.4, 0.19);
-      const material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+      const material = new THREE.MeshLambertMaterial({ color: 0x000000 });
       const wheel = new THREE.Mesh(geometry, material);
-      wheel.receiveShadow = true
+      wheel.castShadow  = true
       wheel.position.y = -0.4;
       wheel.rotation.x += Math.PI / 2;
-      var dz = 0.9 - 0.19 / 2 + 0.01;
+      var dz = 1 - 0.19 / 2 + 0.01;
       var dx = 1.2;
       var wheels = new THREE.Group()
       var positions = [[dx, dz], [dx, -dz], [-dx, dz], [-dx, -dz]]
@@ -133,11 +134,11 @@
     car.position.set(0, 0, 0)
     car.rotation.set(0, -Math.PI, 0)
     car.scale.set(.1, .1, .1);
+    car.castShadow  = true;
     // scene.add( carBase )
     scene.add(camera);
     scene.add(car);
     scene.add(axesHelper);
-
 
     function createBox(){
       const geometry = new THREE.BoxGeometry( 1, 1, 1 );
@@ -202,12 +203,22 @@
 
 
 
-    const light = new THREE.PointLight( '#ffffff' , 10);
-    light.position.set(2, 2, 2);
+    const light = new THREE.PointLight( '#ffffff' , 1);
+    light.position.set(-5, 1, 0);
+    light.castShadow = true;
     scene.add( light );
     const helperLight = new THREE.PointLightHelper(light);
-    scene.add(helperLight);
+    // scene.add(helperLight);
 
+    const planeGeometry = new THREE.PlaneGeometry( 50, 50 );
+    const planeMaterial = new THREE.ShadowMaterial()
+    const plane = new THREE.Mesh( planeGeometry, planeMaterial );
+    plane.receiveShadow = true;
+    plane.rotation.x = -Math.PI/2
+    plane.position.y = -0.08
+    // plane.visible = false;
+    console.log(car)
+    scene.add( plane );
 
     // const color = 0xFFFFFF;
     // const intensity = 1;
@@ -218,7 +229,7 @@
 
 
 
-    const circle = { center_x: -2, center_z: -2, radius: 1 }
+    const circle = { center_x: -3, center_z: -3, radius: 2 }
     var theta = 0
 
     function animate() {
@@ -229,7 +240,7 @@
       car.position.z = circle.center_z + circle.radius * Math.sin(theta)
       car.position
       // console.log(car.position)
-      theta += .01
+      theta += 0.01
       car.rotation.y = (3 * Math.PI / 2 - theta)
       // cube.rotation.x = theta
       renderer.render(scene, camera)
