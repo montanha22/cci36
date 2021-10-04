@@ -210,7 +210,8 @@
     const plane = new THREE.Mesh( planeGeometry, planeMaterial );
     plane.receiveShadow = true;
     plane.rotation.x = -Math.PI/2
-    plane.position.y = -0.08
+    plane.position.y = 0;
+    car.position.y = 0.08;
     // plane.visible = false;
     console.log(car)
     scene.add( plane );
