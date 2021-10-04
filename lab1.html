@@ -11,10 +11,30 @@
       overflow: hidden;
     }
   </style>
+  <style>
+    input.chk  {
+      width:20px;
+      height: 20px;
+    }
+  </style>
 </head>
 
 <body>
   <!-- canvas id="hicanvas" width="600" height="600"></canvas -->
+  
+  <div class="container">
+  <h1>Projeto 1 - CCI36 - 2021</h1>
+  <p style="font-size:160%;">Selecione os itens que deseja visualizar:</p>
+  <form>
+    <label class="checkbox-inline" style="font-size:160%; width: 300%; height: 300%;">
+      <input class="chk" type="checkbox"  id="chkCar" value="on"> Carro
+    </label>
+    <label class="checkbox-inline" style="font-size:160%;">
+      <input class="chk" type="checkbox"  id="chkHelper" value="on">Eixos e Plano
+    </label>
+  </form>
+  </div>
+  
   <canvas id="offscreen" width="2048" height="1360" style="display:none"></canvas>
   <img id="ico" width="2048" height="1360" src="static/mesa.jpg" />
 
@@ -150,58 +170,29 @@
     const cube = createBox();
     // scene.add(cube);
 
+    car.visible = false;
+    axesHelper.visible = false;
+    gridHelper.visible = false;
 
+    var chkCar = document.getElementById("chkCar");
+    var chkHelper = document.getElementById("chkHelper");
 
-    var btn1 = document.createElement("BUTTON");
-    var a = document.createTextNode("Imagem");
-    btn1.appendChild(a);
-    document.body.appendChild(btn1);
-
-    btn1.onclick = function () {
-      imagem();
-    }
-
-    var imagem = function () {
-      requestAnimationFrame(imagem);
-      axesHelper.visible = false;
-      car.visible = false;
-      renderer.imagem(scene, camera);
-    }
-
-    var btn2 = document.createElement("BUTTON");
-    var b = document.createTextNode("Animacao");
-    btn2.appendChild(b);
-    document.body.appendChild(btn2);
-
-    btn2.onclick = function () {
-      animacao();
-    }
-
-    var animacao = function () {
-      requestAnimationFrame(animacao);
-      car.visible = true;
-      axesHelper.visible = false
-      renderer.animacao(scene, camera);
-    }
-
-
-    var btn3 = document.createElement("BUTTON");
-    var c = document.createTextNode("Eixos");
-    btn3.appendChild(c);
-    document.body.appendChild(btn3);
-
-    btn3.onclick = function () {
-      eixos();
-    }
-
-    var eixos = function () {
-      requestAnimationFrame(eixos);
-      axesHelper.visible = true;
-      car.visible = false;
-      renderer.eixos(scene, camera);
-    }
-
-
+    document.getElementById("chkCar").onclick = function() {
+        if (chkCar.checked) {
+             car.visible = true;
+        } else {
+             car.visible = false;
+        }
+    };
+    document.getElementById("chkHelper").onclick = function() {
+        if (chkHelper.checked) {
+            axesHelper.visible = true;
+            gridHelper.visible = true;
+        } else {
+            axesHelper.visible = false;
+            gridHelper.visible = false;
+        }
+    };
 
     const light = new THREE.PointLight( '#ffffff' , 1);
     light.position.set(-5, 1, 0);
