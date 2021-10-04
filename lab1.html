@@ -20,6 +20,7 @@
 
   <script type="module">
     import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
+    import { OrbitControls } from "https://threejs.org/examples/jsm/controls/OrbitControls.js";
 
     const imageWidth = 2048
     const imageHeight = 1360
@@ -28,7 +29,7 @@
 
     var k = document.getElementById("ico");
     var b = k.getBoundingClientRect();
-    console.log(b);
+    // console.log(b);
 
     var x = document.createElement("CANVAS");
     x.style.position = "absolute";
@@ -43,17 +44,17 @@
 
       const m = new THREE.Matrix4();
       m.set(
-         0.73309873,  -0.079348, -0.67547772,  -1.5497599,
-         0.63559657, 0.43337594,  0.63890711, 19.26725785,
-        -0.24203979, 0.89771331, -0.36814067, -2.28566293,
-                 0.,         0.,          0.,          1.,
+        0.73309873,  -0.079348  ,  -0.67547772,   1.5497599 ,
+        -0.24203979,   0.89771331,  -0.36814067,   2.28566293,
+         0.63559657,   0.43337594,   0.63890711, -19.26725785,
+         0.        ,   0.        ,   0.        ,   1.      ,
       ); // calculado no script python
       const fov = 14;
       const aspect = 2048 / 1360;
-      const camera = new THREE.PerspectiveCamera(14, aspect, 0.01, 2000);
+      const camera = new THREE.PerspectiveCamera(10, aspect, 0.001, 20000);
 
       camera.applyMatrix4(m);
-      camera.position.set(11.66329729, 6.42106631, 14.19826186); // calculado no script python
+      camera.position.set( 14.19826186,  6.42106631,  11.66329729,); // calculado no script python
       camera.lookAt(0, 0, 0);
       camera.setViewOffset(
         imageWidth,
@@ -72,10 +73,12 @@
     const scene = new THREE.Scene()
     const camera = createProjCamera()
     const renderer = new THREE.WebGLRenderer({ antialias: true, canvas: canvas, alpha: true })
+    renderer.shadowMap.enabled = true
 
     // adding axes lines to scene
     var axesHelper = new THREE.AxesHelper(400)
     axesHelper.position.set(0, 0, 0)
+    const controls = new OrbitControls( camera, renderer.domElement );
 
     // window.onresize = canvasResize
     // function canvasResize() {
@@ -85,22 +88,26 @@
 
     function createCarBase() {
       const geometry = new THREE.BoxGeometry(4.5, 0.8, 1.8);
-      const material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+      const material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
       const carBase = new THREE.Mesh(geometry, material);
       return carBase;
     }
     function createCarTop() {
       const geometry = new THREE.BoxGeometry(3, 0.8, 1.8);
-      const material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+      const material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+      
       const carTop = new THREE.Mesh(geometry, material);
+      carTop.receiveShadow = true
       carTop.position.y += 0.8;
       carTop.position.x -= 0.75;
+
       return carTop;
     }
     function createWheels() {
       const geometry = new THREE.CylinderGeometry(0.4, 0.4, 0.19);
-      const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
       const wheel = new THREE.Mesh(geometry, material);
+      wheel.receiveShadow = true
       wheel.position.y = -0.4;
       wheel.rotation.x += Math.PI / 2;
       var dz = 0.9 - 0.19 / 2 + 0.01;
@@ -119,15 +126,30 @@
     const carBase = createCarBase();
     const carTop = createCarTop();
     const wheels = createWheels();
+
     const car = new THREE.Group()
-    car.add(carBase); car.add(carTop); car.add(wheels)
+
+    car.add(carBase); car.add(wheels); car.add(carTop); 
     car.position.set(0, 0, 0)
     car.rotation.set(0, -Math.PI, 0)
     car.scale.set(.1, .1, .1);
-
-    scene.add(camera)
+    // scene.add( carBase )
+    scene.add(camera);
     scene.add(car);
-    scene.add(axesHelper)
+    scene.add(axesHelper);
+
+
+    function createBox(){
+      const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+      const material = new THREE.MeshLambertMaterial( {color: 0x00ff00} );
+      const cube = new THREE.Mesh( geometry, material );
+      return cube;
+    } 
+ 
+    const cube = createBox();
+    // scene.add(cube);
+
+
 
     var btn1 = document.createElement("BUTTON");
     var a = document.createTextNode("Imagem");
@@ -180,7 +202,23 @@
 
 
 
-    const circle = { center_x: -5, center_z: -5, radius: 4 }
+    const light = new THREE.PointLight( '#ffffff' , 10);
+    light.position.set(2, 2, 2);
+    scene.add( light );
+    const helperLight = new THREE.PointLightHelper(light);
+    scene.add(helperLight);
+
+
+    // const color = 0xFFFFFF;
+    // const intensity = 1;
+    // const alight = new THREE.AmbientLight(color, intensity);
+    // // scene.add(alight);
+
+
+
+
+
+    const circle = { center_x: -2, center_z: -2, radius: 1 }
     var theta = 0
 
     function animate() {
@@ -190,15 +228,17 @@
       car.position.x = circle.center_x + circle.radius * Math.cos(theta)
       car.position.z = circle.center_z + circle.radius * Math.sin(theta)
       car.position
-      console.log(car.position)
+      // console.log(car.position)
       theta += .01
       car.rotation.y = (3 * Math.PI / 2 - theta)
-
+      // cube.rotation.x = theta
       renderer.render(scene, camera)
     }
 
 
-    console.log(camera)
+
+    console.log(car)
+    // console.log(camera)
     animate()
 
   </script>
