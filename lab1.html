@@ -94,7 +94,11 @@
     const camera = createProjCamera()
     const renderer = new THREE.WebGLRenderer({ antialias: true, canvas: canvas, alpha: true })
     renderer.shadowMap.enabled = true
-
+    
+    // adding a plane to scene
+    const gridHelper = new THREE.GridHelper( 30, 100 );
+    scene.add( gridHelper );
+    
     // adding axes lines to scene
     var axesHelper = new THREE.AxesHelper(400)
     axesHelper.position.set(0, 0, 0)
